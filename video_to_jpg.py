@@ -6,7 +6,7 @@
 # Created Date: 2022-05-07 18:23:39
 # Author: Simon Liu
 # -----
-# Last Modified: 2022-05-20 19:07:47
+# Last Modified: 2022-05-20 19:56:36
 # Modified By: Simon Liu
 # -----
 # Copyright (c) 2022 SimonLiu Inc.
@@ -28,37 +28,46 @@ dst_path = src_path.parent/f'{basename}_frames'
 # Option to decide whether to save frame to independent folders ，每个视频帧是否保存在独立文件夹，默认为False
 independent_folder = False
 # Skip {frame_to_skip} frames before saving another frame ，保存图片的间隔帧数
-frame_to_skip = 5
+frame_to_skip = 15
 total_saved = 0
-
+total_file_count = 0
+current_file = 0
 file_types = ['MOV','MP4','AVI','FLV']
 
+def get_total_file_count(dir):
+    global total_file_count,file_types
+    # Get total file count
+    for f in dir.glob('**/*'):
+        if(f.is_file() and (f.suffix.upper()[1:] in file_types)):
+            total_file_count += 1
+        else:
+            pass
+
 def browse_video_files(dir):
-    filecount = 0
-    global file_types,total_saved
+    global file_types,total_saved,total_file_count,current_file
     if dir.exists():
-        print('找到源视频文件夹:',dir)
+        print('找到源视频文件夹:%s, \n符合条件的视频文件总数:%d'%(str(dir),total_file_count))
         for f in dir.glob('**/*'):
+            current_file += 1
             if(f.is_file() and (f.suffix.upper()[1:] in file_types)):
-                print('正在转换文件 ------->>>',f.name)
+                print(f'正在转换文件({current_file}/{total_file_count})------->>>',f.name)
                 video2pic(f)
-                filecount += 1
             else:
                 pass
     else:
         print('文件夹不存在:',str(dir))
-    print(f'总共转换了{filecount}个文件, 提取了{total_saved}帧图片。')
+    
 
 def video2pic(f):
     global src_path,dst_path,frame_to_skip,total_saved
     filename = f.stem #获取文件名，不含后缀
     cap = cv2.VideoCapture(str(f))
-    fps = cap.get(cv2.CAP_PROP_FPS)  # 获取帧率
+    fps = int(cap.get(cv2.CAP_PROP_FPS))  # 获取帧率
     width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))  # 获取宽度
     height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))  # 获取高度
     fcount = cap.get(cv2.CAP_PROP_FRAME_COUNT)      # 获取视频总帧数
     frame_to_save =  int(fcount/frame_to_skip)
-    print(f'视频文件帧率：{fps}, 分辨率:{width}x{height},视频总帧数:{fcount},保存间隔帧率:{frame_to_skip},预计提取帧数:{frame_to_save}')
+    print(f'视频文件帧率：{fps}, 分辨率:{width}x{height},视频总帧数:{fcount},保存间隔帧数:{frame_to_skip},预计保存帧数:{frame_to_save}')
     suc = cap.isOpened()  # 是否成功打开
     frame_count = 0
     frame_saved = 0
@@ -83,8 +92,13 @@ def video2pic(f):
         suc, frame = cap.read()
         cv2.waitKey(1)
     cap.release()
-    print(f'\n视频转图片结束！从视频 {f.name} 中提取了 {frame_saved} 帧画面。')
-     
-     
-if __name__ == '__main__':
+    print(f'\n视频转图片结束！从视频 {f.name} 中保存了 {frame_saved} 帧画面。')
+
+def main():
+    global total_file_count,total_saved
+    get_total_file_count(src_path)
     browse_video_files(src_path)
+    print(f'总共转换了{total_file_count}个文件, 保存了{total_saved}帧图片。')
+
+if __name__ == '__main__':
+    main()
