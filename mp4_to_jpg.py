@@ -6,7 +6,7 @@
 # Created Date: 2022-05-07 18:23:39
 # Author: Simon Liu
 # -----
-# Last Modified: 2022-05-07 18:29:23
+# Last Modified: 2022-05-20 17:07:59
 # Modified By: Simon Liu
 # -----
 # Copyright (c) 2022 SimonLiu Inc.
@@ -19,8 +19,6 @@
 ###
 import cv2
 from cv2 import VideoWriter, VideoWriter_fourcc, imread, resize
-# import os
-# from PIL import Image
 from pathlib import Path
      
 
