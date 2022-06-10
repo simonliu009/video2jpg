@@ -6,3 +6,6 @@ A python script that converts video to jpg files
 
 1. `video_to_jpg.py`: A complete script with input and output path defined.
 2. `mp4_to_jpg`: A simple script for function test.
+
+效果图：
+![](./resources/video2jpg.png)
